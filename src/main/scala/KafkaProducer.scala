@@ -1,26 +1,16 @@
 import java.util.Properties
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-import org.apache.log4j.LogManager
-import org.apache.log4j.spi.LoggerFactory
 import org.json4s.DefaultFormats
 
 import scala.io.Source
 import org.json4s.native.JsonMethods._
 import org.json4s.JsonDSL.WithBigDecimal._
 
-
-
 object KafkaProducer extends App {
 
   val topic = "KafkaProducerTopic"
   val brokers = "localhost:9092"
   val props = new Properties()
-
-  println("starting kafka")
-  val logger = LogManager.getLogger(this.getClass)
-
-  logger.info("Starting Kafka producer")
-
 
   props.put("bootstrap.servers", brokers)
   props.put("client.id", "ScalaProducer")
@@ -29,9 +19,11 @@ object KafkaProducer extends App {
 
   val producer = new KafkaProducer[String, String](props)
   val bufferedSource = Source.fromFile("/home/francisco/Documentos/1-UTAD_TFM/taxi/yellow_tripdata_2020-01.csv")
-// VendorID,tpep_pickup_datetime,tpep_dropoff_datetime,passenger_count,trip_distance,RatecodeID,
+
+  // VendorID,tpep_pickup_datetime,tpep_dropoff_datetime,passenger_count,trip_distance,RatecodeID,
   // store_and_fwd_flag,PULocationID,DOLocationID,payment_type,fare_amount,extra,mta_tax,tip_amount,
   // tolls_amount,improvement_surcharge,total_amount,congestion_surcharge
+
   for (line <- bufferedSource.getLines.drop(1)) {
     val cols = line.split(",").map(_.trim)
     val json = ("tripduration" -> cols(0)) ~
