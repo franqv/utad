@@ -26,24 +26,23 @@ object KafkaProducer extends App {
 
   for (line <- bufferedSource.getLines.drop(1)) {
     val cols = line.split(",").map(_.trim)
-    val json = ("tripduration" -> cols(0)) ~
-      ("VendorID" -> cols(1)) ~
-      ("startime" -> cols(2)) ~
-      ("stoptime" -> cols(3)) ~
-      ("passenger_count" -> cols(4)) ~
-      ("trip_distance" -> cols(5)) ~
-      ("RatecodeID" -> cols(6)) ~
-      ("store_and_fwd_flag" -> cols(7)) ~
-      ("PULocationID" -> cols(8)) ~
-      ("DOLocationID" -> cols(9)) ~
-      ("payment_type" -> cols(10)) ~
-      ("fare_amount" -> cols(11)) ~
-      ("extra" -> cols(12)) ~
-      ("tip_amount" -> cols(13)) ~
-      ("tolls_amount" -> cols(14)) ~
-      ("improvement_surcharge" -> cols(15)) ~
-      ("total_amount" -> cols(16)) ~
-      ("congestion_surcharge" -> cols(17))
+    val json = ("VendorID" -> cols(0)) ~
+      ("startime" -> cols(1)) ~
+      ("stoptime" -> cols(2)) ~
+      ("passenger_count" -> cols(3)) ~
+      ("trip_distance" -> cols(4)) ~
+      ("RatecodeID" -> cols(5)) ~
+      ("store_and_fwd_flag" -> cols(6)) ~
+      ("PULocationID" -> cols(7)) ~
+      ("DOLocationID" -> cols(8)) ~
+      ("payment_type" -> cols(9)) ~
+      ("fare_amount" -> cols(10)) ~
+      ("extra" -> cols(11)) ~
+      ("tip_amount" -> cols(12)) ~
+      ("tolls_amount" -> cols(13)) ~
+      ("improvement_surcharge" -> cols(14)) ~
+      ("total_amount" -> cols(15)) ~
+      ("congestion_surcharge" -> cols(16))
 
     implicit val formats: DefaultFormats.type = DefaultFormats
 
