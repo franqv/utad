@@ -1,15 +1,17 @@
 import java.util.Properties
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
-// import org.json4s.DefaultFormats
+import org.json4s.DefaultFormats
 
 import scala.io.Source
-// import org.json4s.native.JsonMethods._
-// import org.json4s.JsonDSL.WithBigDecimal._
+import org.json4s.native.JsonMethods._
+import org.json4s.JsonDSL.WithBigDecimal._
 import com.google.gson.Gson
+
 
 object KafkaProducer extends App {
 
   val topic = "taxiTopic"
+  //val brokers = "kafka1:19092"//
   val brokers = "localhost:9092"
   val props = new Properties()
 

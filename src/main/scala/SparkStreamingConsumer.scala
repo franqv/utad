@@ -8,7 +8,7 @@ import org.json4s._
 import org.json4s.jackson.JsonMethods._
 import org.apache.spark.sql.{SQLContext}
 
-object sparkPruebas extends App {
+object sparkConsumer extends App {
   val topic = "taxiTopic"
   val filePath = "/home/francisco/Documentos/1-UTAD_TFM/taxi/yellow_tripdata_2020-01.csv"
   val separator = ","
@@ -17,6 +17,7 @@ object sparkPruebas extends App {
     .set("spark.hadoop.fs.defaultFS", "hdfs://localhost:8020")
     .set("mapreduce.fileoutputcommitter.algorithm.version", "2")
     .set("spark.app.id", "Spark")
+    .set("spark.cassandra.connection.host", "localhost:7000")
 
   val sc = new SparkContext(conf)
   val ssc = new StreamingContext(sc, Seconds(1))
@@ -35,35 +36,17 @@ object sparkPruebas extends App {
     Subscribe[String, String](topics, kafkaParams)
   )
 
-  val sqlContext = new SQLContext(sc)
+  // val sqlContext = new SQLContext(sc)
 
-  import sqlContext.implicits._
+  // import sqlContext.implicits._
 
-  val values = stream.map(record => (record.key(), parse(record.value()).values.asInstanceOf[Map[String, Double]]))
+  // val values = stream.map(record => (record.key(), parse(record.value()).values.asInstanceOf[Map[String, Any]]))
+  val values = stream.map(record => parse(record.value()).values.asInstanceOf[Map[String, Any]])
 
   values.foreachRDD(rdd => if (!rdd.partitions.isEmpty)
-    rdd.map(x => (x._1, x._2("diff_pickup_dropoff"), x._2("passenger_count"), x._2("trip_distance"), x._2("total_amount")))
-      .toDF("day", "diff_pickup_dropoff", "passenger_count", "trip_distance", "total_amount")
+    rdd.map(x => (("VendorID"), x("tpep_pickup_datetime"), x("tpep_dropoff_datetime"), x("passenger_count"), x("trip_distance"), x("RatecodeID"), x("store_and_fwd_flag"), x("PULocationID"), x("DOLocationID"), x("payment_type"), x("fare_amount"), x("extra"), x("mta_tax"), x("tip_amount"), x("tolls_amount"), x("improvement_surcharge"), x("total_amount"), x("congestion_surcharge")))
+      .toDF("VendorID","tpep_pickup_datetime","tpep_dropoff_datetime","passenger_count","trip_distance","RatecodeID","store_and_fwd_flag","PULocationID","DOLocationID","payment_type","fare_amount","extra","mta_tax","tip_amount","tolls_amount","improvement_surcharge","total_amount","congestion_surcharge")
       .write.format("parquet").mode("append").save("/taxisDF/"))
-
-  stream.map(record => (record.key, Tuple5(
-    parse(record.value()).values.asInstanceOf[Map[String, Double]]("diff_pickup_dropoff"),
-    parse(record.value()).values.asInstanceOf[Map[String, Double]]("passenger_count"),
-    parse(record.value()).values.asInstanceOf[Map[String, Double]]("trip_distance"),
-    parse(record.value()).values.asInstanceOf[Map[String, Double]]("total_amount"),
-    1)))
-    .foreachRDD(rdd => rdd.reduceByKey((x, y) => (x._1.toFloat + y._1.toFloat,
-      x._2.toFloat + y._2.toFloat,
-      x._3.toFloat + y._3.toFloat,
-      x._4.toFloat + y._4.toFloat,
-      x._5 + y._5))
-      .map(x => (x._1,
-        x._2._1 / x._2._5,
-        x._2._2 / x._2._5,
-        x._2._3 / x._2._5,
-        x._2._4 / x._2._5))
-      .toDF("Day", "travelTimeAvg(Min)", "passengerAvg", "tripDistanceAvg(Miles)", "totalAmountAvg(USD)")
-      .withColumn("Day", to_date($"Day", "yyy-MM-dd"))) //.write.mode("append").mongo())
 
   ssc.start()
   ssc.awaitTermination()
