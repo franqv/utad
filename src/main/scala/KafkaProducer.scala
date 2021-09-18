@@ -13,6 +13,7 @@ object KafkaProducer extends App {
   val topic = "taxiTopic"
   //val brokers = "kafka1:19092"//
   val brokers = "localhost:9092"
+  val filePath = "/home/francisco/Documentos/1-UTAD_TFM/taxi/yellow_tripdata_2020-01.csv"
   val props = new Properties()
 
   props.put("bootstrap.servers", brokers)
@@ -21,7 +22,7 @@ object KafkaProducer extends App {
   props.put("value.serializer","org.apache.kafka.common.serialization.StringSerializer")
 
   //val producer = new KafkaProducer[String, String](props)
-  val bufferedSource = Source.fromFile("/home/francisco/Documentos/1-UTAD_TFM/taxi/yellow_tripdata_2020-01.csv")
+  val bufferedSource = Source.fromFile(filePath)
 
   // VendorID,tpep_pickup_datetime,tpep_dropoff_datetime,passenger_count,trip_distance,RatecodeID,
   // store_and_fwd_flag,PULocationID,DOLocationID,payment_type,fare_amount,extra,mta_tax,tip_amount,
