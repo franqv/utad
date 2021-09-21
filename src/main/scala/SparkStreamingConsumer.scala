@@ -1,12 +1,10 @@
-import org.apache.spark.sql.functions._
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.streaming.kafka010._
-import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.streaming.kafka010.ConsumerStrategies.Subscribe
+import org.apache.spark.streaming.kafka010.LocationStrategies.PreferConsistent
+import org.apache.spark.streaming.kafka010._
 import org.apache.spark.streaming.{Seconds, StreamingContext}
-import org.json4s._
+import org.apache.spark.{SparkConf, SparkContext}
 import org.json4s.jackson.JsonMethods._
-import org.apache.spark.sql.{SQLContext, SparkSession}
 // import com.datastax.driver.core.Cluster
 
 object sparkConsumer extends App {
@@ -29,6 +27,8 @@ object sparkConsumer extends App {
     "key.deserializer" -> "org.apache.kafka.common.serialization.StringDeserializer",
     "value.deserializer" -> "org.apache.kafka.common.serialization.StringDeserializer",
     "group.id" -> "consumer-spark",
+    "enable.auto.commit" -> "true",
+    "auto.commit.interval.ms" -> "1000",
     "auto.offset.reset" -> "latest",
   )
 
@@ -63,6 +63,7 @@ object sparkConsumer extends App {
         " USING cassandra PARTITIONED BY (VendorID)")
 
       taxiDF.write.format("org.apache.spark.sql.cassandra").options(Map( "table" -> "rawinfo", "keyspace" -> "utad.taxis")).save()
+      spark.close()
     }
   }
 

@@ -1,7 +1,7 @@
 
-import java.util.{Collections, Properties}
-import java.util.regex.Pattern
 import org.apache.kafka.clients.consumer.KafkaConsumer
+
+import java.util.Properties
 import scala.collection.JavaConverters._
 object KafkaConsumerSubscribeApp extends App {
 
@@ -15,7 +15,7 @@ object KafkaConsumerSubscribeApp extends App {
   props.put("enable.auto.commit", "true")
   props.put("auto.commit.interval.ms", "1000")
   val consumer = new KafkaConsumer(props)
-  val topics = List("topic_text")
+  val topics = List("taxiTopic")
   try {
     consumer.subscribe(topics.asJava)
     while (true) {
