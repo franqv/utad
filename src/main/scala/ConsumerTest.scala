@@ -15,7 +15,7 @@ object ConsumerTest extends App {
     "bootstrap.servers" -> "localhost:9092",
     "key.deserializer" -> "org.apache.kafka.common.serialization.StringDeserializer",
     "value.deserializer" -> "org.apache.kafka.common.serialization.StringDeserializer",
-    //"group.id" -> "consumer-spark",
+    "group.id" -> "consumer-spark",
     //"enable.auto.commit" -> "true",
     //"auto.commit.interval.ms" -> "1000",
     //"auto.offset.reset" -> "latest",

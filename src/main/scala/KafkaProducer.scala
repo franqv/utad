@@ -10,8 +10,8 @@ object KafkaProducer extends App {
   val topic = "taxiTopic"
   //val brokers = "kafka1:19092"//
   val brokers = "localhost:9092"
-  //val filePath = "/home/francisco/Documentos/1-UTAD_TFM/taxi/yellow_tripdata_2020-01.csv"
-  val filePath = "/home/mafernandez/Descargas/yellow_tripdata_2020-01.csv"
+  val filePath = "/home/francisco/Documentos/1-UTAD_TFM/taxi/yellow_tripdata_2020-01.csv"
+  //val filePath = "/home/mafernandez/Descargas/yellow_tripdata_2020-01.csv"
   val props = new Properties()
 
   props.put("bootstrap.servers", brokers)
