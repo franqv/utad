@@ -55,11 +55,6 @@
         </dependency>
         <dependency>
             <groupId>org.json4s</groupId>
-            <artifactId>json4s-native_2.12</artifactId>
-            <version>4.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json4s</groupId>
             <artifactId>json4s-core_2.12</artifactId>
             <version>4.0.3</version>
         </dependency>

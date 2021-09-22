@@ -4,7 +4,6 @@ import org.apache.spark.streaming.kafka010._
 import org.apache.spark.streaming.{Seconds, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 // import com.datastax.driver.core.Cluster
-
 object ConsumerTest extends App {
   val topic = "taxiTopic"
   val conf = new SparkConf().setAppName("streamingApp").setMaster("local[4]")
