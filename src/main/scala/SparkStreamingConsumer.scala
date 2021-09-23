@@ -45,7 +45,7 @@ object sparkConsumer extends App {
 
   // val values = stream.map(record => (record.key(), parse(record.value()).values.asInstanceOf[Map[String, Any]]))
 
-  val values = stream.map(record => parse(record.value()).values.asInstanceOf[Map[String, Any]])
+  val values = stream.map(record => parse(record.value()).values.asInstanceOf[Map[String, String]])
 
   // val spark = new SparkSession(sc)
   // import spark.implicits._
@@ -64,7 +64,7 @@ object sparkConsumer extends App {
         " USING cassandra PARTITIONED BY (VendorID)")
 
       taxiDF.write.format("org.apache.spark.sql.cassandra").options(Map( "table" -> "rawinfo", "keyspace" -> "utad.taxis")).save()
-      spark.close()
+      // spark.close()
     }
   }
 
