@@ -10,6 +10,7 @@
 
     <properties>
         <spark.version>2.4.7</spark.version>
+        <!--<spark.version>3.1.0</spark.version>-->
     </properties>
 
     <dependencies>
@@ -38,6 +39,13 @@
             <artifactId>spark-streaming-kafka-0-10_2.12</artifactId>
             <version>${spark.version}</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/com.datastax.spark/spark-cassandra-connector -->
+        <dependency>
+            <groupId>com.datastax.spark</groupId>
+            <artifactId>spark-cassandra-connector_2.12</artifactId>
+            <version>2.5.2</version>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-scala_2.12</artifactId>

@@ -68,6 +68,55 @@ services:
     links:
       - spark-master
 
+  zeppelin:
+    image: bde2020/zeppelin:0.0.1-zeppelin-0.7.1-hadoop-2.8.0-spark-2.1.0
+    container_name: zeppelin
+    ports:
+      - 80:8080
+    volumes:
+      - ./data:/data
+      - ./data:/opt/zeppelin/data
+  #    - ./data/zeppelin/conf:/opt/zeppelin/conf
+      - ./data/zeppelin/logs:/opt/zeppelin/logs
+      - ./data/zeppelin/notebooks:/opt/zeppelin/notebook
+      - ./data/zeppelin/examples:/opt/sansa-examples
+    environment:
+      CORE_CONF_fs_defaultFS: "hdfs://namenode:8020"
+      SPARK_MASTER: "spark://spark-master:7077"
+      MASTER: "spark://spark-master:7077"
+      SPARK_SUBMIT_OPTIONS: "--jars /opt/sansa-examples/jars/sansa-examples-spark.jar --conf spark.serializer=org.apache.spark.serializer.KryoSerializer"
+    links:
+      - spark-master
+
+  hive-server:
+    image: bde2020/hive
+    container_name: hive-server
+    env_file:
+      - ./hadoop-hive.env
+    environment:
+      - "HIVE_CORE_CONF_javax_jdo_option_ConnectionURL=jdbc:postgresql://hive-metastore/metastore"
+    links:
+      - namenode
+      - hive-metastore
+    ports:
+      - 10000:10000
+
+  hive-metastore-postgresql:
+    image: bde2020/hive-metastore-postgresql
+    container_name: hive-metastore-postgresql
+
+  hive-metastore:
+    image: bde2020/hive
+    container_name: hive-metastore
+    env_file:
+      - ./hadoop-hive.env
+    links:
+      - namenode
+      - hive-metastore-postgresql
+    command: /opt/hive/bin/hive --service metastore
+    ports:
+      - 9083:9083
+
   zookeeper:
     image: confluentinc/cp-zookeeper
     container_name: zookeeper
@@ -87,6 +136,33 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  nifi:
+    image: xemuliam/nifi
+    container_name: nifi
+    ports:
+      - 5080:8080
+      - 5443:8443
+      - 5081:8081
+## for scaling we have to do this
+#      - 8080
+    links:
+      - zookeeper
+      - kafka
+    depends_on:
+      - zookeeper
+      - kafka
+    volumes:
+      - ./data/nifi/conf:/opt/nifi/conf
+      - ./data/nifi/logs:/opt/nifi/logs
+      - ./data:/opt/datafiles
+      - ./data/nifi:/opt/nifi/flowfile_repository
+      - ./data/nifi:/opt/nifi/database_repository
+      - ./data/nifi:/opt/nifi/content_repository
+      - ./data/nifi:/opt/nifi/provenance_repository
+    environment:
+      ZK_NODES_LIST: zookeeper
+      IS_CLUSTER_NODE: 1
+      ELECTION_TIME: 1 min
 
   cassandra:
     image: docker.io/bitnami/cassandra:4.0
@@ -94,20 +170,21 @@ services:
     ports:
       - '7000:7000'
       - '9042:9042'
-#    volumes:
-#      - ./data/cassandra_data:/bitnami
+    volumes:
+      - ./data/cassandra_data:/bitnami
     environment:
       - CASSANDRA_SEEDS=cassandra
       - CASSANDRA_PASSWORD_SEEDER=yes
 #      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_PASSWORD=cassandra
-      - MAX_HEAP_SIZE=2G
-      - HEAP_NEWSIZE=200M
+
+
 
 volumes:
   namenode:
   datanode:
   zookeeper:
   kafka:
-#  cassandra_data:
+  nifi:
+  cassandra_data:
 #    driver: local
