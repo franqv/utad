@@ -101,7 +101,7 @@ services:
       - CASSANDRA_PASSWORD_SEEDER=yes
 #      - CASSANDRA_CLUSTER_NAME=cassandra-cluster
       - CASSANDRA_PASSWORD=cassandra
-      - MAX_HEAP_SIZE=2G
+      - MAX_HEAP_SIZE=1G
       - HEAP_NEWSIZE=200M
 
 volumes:

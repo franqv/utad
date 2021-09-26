@@ -17,7 +17,7 @@ object ConsumerTest extends App {
     .set("spark.hadoop.fs.defaultFS", "hdfs://localhost:8020")
     .set("spark.app.id", "Spark")
     .set("spark.sql.warehouse.dir", "")
-    .set("spark.cassandra.connection.host", "localhost")
+    .set("spark.cassandra.connection.host", "127.0.0.1")  // 127.0.0.1     localhost
     .set("spark.cassandra.connection.port","9042")   // probar con 7000 si no funciona
     .set("spark.cassandra.auth.username","cassandra")
     .set("spark.cassandra.auth.password","cassandra")
@@ -42,12 +42,23 @@ object ConsumerTest extends App {
     PreferConsistent,
     Subscribe[String, String](topics, kafkaParams)
   )
+
+  // val sqlContext = new SQLContext(sc)
+
+  // import sqlContext.implicits._
+
+  // val values = stream.map(record => (record.key(), parse(record.value()).values.asInstanceOf[Map[String, Any]]))
+
   val values = stream.map(record => parse(record.value()).values.asInstanceOf[Map[String, String]])
   // val infoDS = stream.map(record => (record.topic, record.key, record.value))
-  stream.foreachRDD { rdd =>
-    println ("Values: ")
-    println (values)
-  }
+
+  //stream.foreachRDD { rdd =>
+  //  println ("Values: ")
+  //  println (values)
+  //}
+
+  // val spark = new SparkSession(sc)
+  // import spark.implicits._
 
   values.foreachRDD { rdd =>
     if (!rdd.partitions.isEmpty) {
@@ -75,8 +86,35 @@ object ConsumerTest extends App {
       spark.sql("CREATE TABLE IF NOT EXISTS tfm.rawinfo (VendorID Int, tpep_pickup_datetime TIMESTAMP, tpep_dropoff_datetime TIMESTAMP, passenger_count Int, trip_distance DOUBLE, RatecodeID Int, store_and_fwd_flag String, PULocationID Int, DOLocationID Int, payment_type Int, fare_amount DOUBLE, extra DOUBLE, mta_tax DOUBLE, tip_amount DOUBLE, tolls_amount DOUBLE, improvement_surcharge DOUBLE, total_amount DOUBLE, congestion_surcharge DOUBLE)" +
         " USING cassandra PARTITIONED BY (tpep_pickup_datetime)")
        */
-      println (Map( "table" -> "rawinfo", "keyspace" -> "tfm"))
+
       taxiDF.write.format("org.apache.spark.sql.cassandra").options(Map( "table" -> "rawinfo", "keyspace" -> "tfm")).mode(SaveMode.Append).save()
+
+      val key_value = rdd.map(
+        x => (x("tpep_pickup_datetime").split(" ")(0)+"-"+x("tpep_pickup_datetime").split(" ")(1).split(":")(0),
+          (
+            x("tpep_dropoff_datetime").split(" ")(1).split(":")(0).toFloat*3600+x("tpep_dropoff_datetime").split(" ")(1).split(":")(1).toFloat*60+x("tpep_dropoff_datetime").split(" ")(1).split(":")(2).toFloat-x("tpep_pickup_datetime").split(" ")(1).split(":")(0).toFloat*3600-x("tpep_pickup_datetime").split(" ")(1).split(":")(1).toFloat*60-x("tpep_pickup_datetime").split(" ")(1).split(":")(2).toFloat,
+            x("passenger_count").toFloat,
+            x("trip_distance").toFloat,
+            x("payment_type"),
+            x("total_amount").toFloat,
+            1
+          )
+        )
+      )
+      val olap_cube = key_value.reduceByKey(
+        (x, y) => (x._1 + y._1, x._2 + y._2, x._3 + y._3, x._4 + y._4, x._5 + y._5, x._6 + y._6)
+      ).mapValues {
+        case (sum1, sum2, sum3, total, sum4, count) => ((1.0 * sum1) / count, (1.0 * sum2) / count, (1.0 * sum3) / count, total, (1.0 * sum4) / count)
+      }.map(
+        x => (x._1,x._2._1,x._2._2,x._2._3,x._2._4,x._2._5)
+      ).toDF(
+        "dia_hora","travel_time","avg_passengers","avg_trip_distance","type_payments","avg_total_amount"
+      )
+      println (olap_cube)
+      olap_cube.show(5)
+
+      olap_cube.write.format("org.apache.spark.sql.cassandra").options(Map( "table" -> "olap_cube", "keyspace" -> "tfm")).mode(SaveMode.Append).save()
+
       // spark.close()
     }
   }
