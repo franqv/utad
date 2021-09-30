@@ -51,7 +51,7 @@ object sparkConsumer extends App {
         .toDF("vendorid", "tpep_pickup_datetime", "tpep_dropoff_datetime", "passenger_count", "trip_distance", "ratecodeid", "store_and_fwd_flag", "pulocationid", "dolocationid", "payment_type", "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount", "improvement_surcharge", "total_amount", "congestion_surcharge")
       taxiDF.write.format("parquet").mode("append").save("/tfm/taxi/")
 
-      taxiDF.write.format("org.apache.spark.sql.cassandra").options(Map( "table" -> "rawinfo", "keyspace" -> "tfm")).mode(SaveMode.Append).save()
+      //taxiDF.write.format("org.apache.spark.sql.cassandra").options(Map( "table" -> "rawinfo", "keyspace" -> "tfm")).mode(SaveMode.Append).save()
 
       val key_value = rdd.map(
         x => (x("tpep_pickup_datetime").split(" ")(0)+"-"+x("tpep_pickup_datetime").split(" ")(1).split(":")(0),
@@ -68,11 +68,11 @@ object sparkConsumer extends App {
       val olap_cube = key_value.reduceByKey(
         (x, y) => (x._1 + y._1, x._2 + y._2, x._3 + y._3, x._4 + ","+ y._4, x._5 +y._5, x._6 + y._6)
       ).mapValues {
-        case (sum1, sum2, sum3, total, sum4, count) => ((1.0 * sum1) / count, (1.0 * sum2) / count, (1.0 * sum3) / count, total, (1.0 * sum4) / count)
+        case (sum1, sum2, sum3, total, sum4, count) => ((1.0 * sum1) / count, (1.0 * sum2) / count, (1.0 * sum3) / count, total, (1.0 * sum4) / count,count)
       }.map(
-        x => (x._1,x._2._1,x._2._2,x._2._3,x._2._4,x._2._5)
+        x => (x._1,x._2._1,x._2._2,x._2._3,x._2._4,x._2._5,x._2._6)
       ).toDF(
-        "dia_hora","travel_time","avg_passengers","avg_trip_distance","type_payments","avg_total_amount"
+        "dia_hora","travel_time","avg_passengers","avg_trip_distance","type_payments","avg_total_amount","n_count"
       )
       //olap_cube.show(5)
 
