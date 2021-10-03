@@ -1,7 +1,7 @@
 # CREACIÓN DE CUBOS OLAP CON APACHE KAFKA Y APACHE SPARK
 Este código forma parte del Proyecto Fin de Master en la UTAD.
 
-##Flujo de datos del proyecto
+## Flujo de datos del proyecto
 
 ![image](https://user-images.githubusercontent.com/89654447/135769905-3bf4e172-3aea-42dd-9ec6-9ccd6e6c3e49.png)
 
