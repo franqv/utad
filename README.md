@@ -9,6 +9,9 @@ Este proyecto utiliza como dataset el registro de viajes de taxis de Nueva York.
 Los datos se pueden descargar por meses en la siguiente web:
 https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 
+En el siguiente enlace se encuentra el diccionario de las variables del dataset.
+* https://www1.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf
+
 Para poder usar datos de varios meses es necesario juntar los csv en uno único y meter la ruta correspondiente en el producer.
 
 Una vez tenemos los datos, hay que ejecutar el Docker-compose desde la terminal en modo root para levantar los Docker que se han preparado. 
@@ -26,4 +29,4 @@ Una vez dentro de la terminal de cassandra, tenemos que crear tanto un keyspace,
 - USE tfm;
 - CREATE TABLE IF NOT EXISTS tfm.olap_cube (dia_hora text PRIMARY KEY, travel_time DOUBLE, avg_passengers DOUBLE, avg_trip_distance DOUBLE, type_payments text, avg_total_amount * - DOUBLE, n_travel Int) ;
 
-Es interesante destacar que la clave primaria es la variable ‘día_hora’, variable por la cual se va a particionar la tabla. 
+Es interesante destacar que la clave primaria es la variable ‘dia_hora’, variable por la cual se va a particionar la tabla. 
