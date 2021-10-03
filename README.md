@@ -14,6 +14,13 @@ En el siguiente enlace se encuentra el diccionario de las variables del dataset.
 
 Para poder usar datos de varios meses es necesario juntar los csv en uno único y meter la ruta correspondiente en el producer.
 
+El objetivo es:
+1.	A partir del csv generar un steam de datos con Kafka.
+2.	Recibir esos datos en spark .
+3.	Almacenar los datos en bruto en HDFS.
+4.	Procesar los datos y almacenarlos en Cassandra formando el cubo de OLAP deseado.
+5.	Comparación de tiempos entre procesado en streaming y batch.
+
 Una vez tenemos los datos, hay que ejecutar el Docker-compose desde la terminal en modo root para levantar los Docker que se han preparado. 
 * docker-compose up -d
 
