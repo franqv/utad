@@ -50,6 +50,8 @@ object sparkConsumer extends App {
       val taxiDF = rdd.map(x => (x("VendorID"), x("tpep_pickup_datetime"), x("tpep_dropoff_datetime"), x("passenger_count"), x("trip_distance"), x("RatecodeID"), x("store_and_fwd_flag"), x("PULocationID"), x("DOLocationID"), x("payment_type"), x("fare_amount"), x("extra"), x("mta_tax"), x("tip_amount"), x("tolls_amount"), x("improvement_surcharge"), x("total_amount"), x("congestion_surcharge")))
         .toDF("vendorid", "tpep_pickup_datetime", "tpep_dropoff_datetime", "passenger_count", "trip_distance", "ratecodeid", "store_and_fwd_flag", "pulocationid", "dolocationid", "payment_type", "fare_amount", "extra", "mta_tax", "tip_amount", "tolls_amount", "improvement_surcharge", "total_amount", "congestion_surcharge")
       taxiDF.write.format("parquet").mode("append").save("/tfm/taxi/")
+      println("Datos en bruto metidos:")
+      taxiDF.show()
 
       //taxiDF.write.format("org.apache.spark.sql.cassandra").options(Map( "table" -> "rawinfo", "keyspace" -> "tfm")).mode(SaveMode.Append).save()
 
@@ -72,7 +74,7 @@ object sparkConsumer extends App {
       }.map(
         x => (x._1,x._2._1,x._2._2,x._2._3,x._2._4,x._2._5,x._2._6)
       ).toDF(
-        "dia_hora","travel_time","avg_passengers","avg_trip_distance","type_payments","avg_total_amount","n_count"
+        "dia_hora","travel_time","avg_passengers","avg_trip_distance","type_payments","avg_total_amount","n_travel"
       )
       //olap_cube.show(5)
 

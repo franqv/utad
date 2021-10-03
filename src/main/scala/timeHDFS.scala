@@ -25,5 +25,9 @@ object timeHDFS extends App {
     avg(col("total_amount")).as("avg_total_amount"),
     count(col("payment_type")).as("n_count")
   )
-  df_taxi_avg.show()
+
+  spark.time(df_taxi_avg.collect())
+  println("Tiempo de ejecución de recoleccion y transformación de datos desde HDFS")
+  //df_taxi_avg.agg(count(col("dia_hora")).as("Numero_Filas")).show()
+  //df_taxi_avg.show()
 }

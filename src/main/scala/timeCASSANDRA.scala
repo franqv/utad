@@ -15,6 +15,8 @@ object timeCASSANDRA extends App {
   val df = spark.read.format("org.apache.spark.sql.cassandra")
   .options(Map("table" -> "olap_cube", "keyspace" -> "tfm"))
   .load()
-  df.show()
+  spark.time(df.collect())
+  println("Tiempo de ejecución de recoleccion de la tabla olap_cube desde CASSANDRA")
+  //df.show()
 }
 
