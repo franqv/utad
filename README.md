@@ -34,6 +34,6 @@ A continuación entramos en la terminal cqlsh con el usuario y contraseña cassa
 Una vez dentro de la terminal de cassandra, tenemos que crear tanto un keyspace, como la tabla en la que cargará los datos el consumer.
 - CREATE KEYSPACE IF NOT EXISTS tfm WITH REPLICATION ={ 'class':'SimpleStrategy','replication_factor':'1'};
 - USE tfm;
-- CREATE TABLE IF NOT EXISTS tfm.olap_cube (dia_hora text PRIMARY KEY, travel_time DOUBLE, avg_passengers DOUBLE, avg_trip_distance DOUBLE, type_payments text, avg_total_amount * - DOUBLE, n_travel Int) ;
+- CREATE TABLE IF NOT EXISTS tfm.olap_cube (dia_hora text PRIMARY KEY, travel_time DOUBLE, avg_passengers DOUBLE, avg_trip_distance DOUBLE, type_payments text, avg_total_amount DOUBLE, n_travel Int) ;
 
 Es interesante destacar que la clave primaria es la variable ‘dia_hora’, variable por la cual se va a particionar la tabla. 
